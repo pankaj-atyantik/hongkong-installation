@@ -1,0 +1,62 @@
+stage:
+    global:
+        SCD_MATRIX: "en_US"
+        SKIP_COMPOSER_DUMP_AUTOLOAD: false
+
+    build:
+        SCD_COMPRESSION_LEVEL: 6
+        SCD_STRATEGY: "standard"   # or "quick" if you need faster builds
+        ENABLE_GOOGLE_ANALYTICS: false
+        VERBOSE_COMMANDS: false
+
+    deploy:
+        STATIC_CONTENT_THREADS: 3
+        CLEAN_STATIC_FILES: true
+        CLEAR_BOOTSTRAP_CACHE: true
+
+    post-deploy:
+        ENABLE_CRON: true
+        WARM_UP_PAGES:
+            - "/"
+            - "/customer/account/login/"
+            - "/graphql"
+        FLUSH_CACHE: true
+
+php:
+    memory_limit: "2048M"
+    opcache:
+        enable: 1
+        validate_timestamps: 0
+        max_accelerated_files: 65407
+        memory_consumption: 256
+        interned_strings_buffer: 16
+
+magento:
+    mode: "developer"   # "developer" for local, "production" for servers
+    use_redis: true
+    redis:
+        session:
+            host: "redis"
+            port: 6379
+            database: 2
+        default:
+            host: "redis"
+            port: 6379
+            database: 0
+        page_cache:
+            host: "redis"
+            port: 6379
+            database: 1
+
+indexer:
+    mode: "schedule"     # "realtime" for dev/local; "schedule" for prod
+
+deploy_hooks:
+    build:
+        - "composer validate --no-check-all --no-interaction"
+    post-deploy:
+        - "php bin/magento setup:di:compile"
+        - "php bin/magento setup:static-content:deploy -f"
+        - "php bin/magento cache:flush"
+        - "php bin/magento cron:install"
+ 
