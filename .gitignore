@@ -1,9 +1,1 @@
-*
-!composer.json
-!composer.lock
-
-!app/
-!app/config.yml
-
-!/packages/
-!packages/*
+.DS_Store
