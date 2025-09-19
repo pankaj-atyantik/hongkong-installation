@@ -4,3 +4,6 @@
 
 !app/
 !app/config.yml
+
+!/packages/
+!packages/*
